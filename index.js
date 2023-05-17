@@ -12,7 +12,8 @@ const
         port: process.env.PORT || 3000,
         dir: {
             root: __dirname,
-            static: __dirname + 'static' + sep
+            static: __dirname + 'static' + sep,
+            views: __dirname + 'views' + sep
         }
     };
 
@@ -24,6 +25,9 @@ const app = express();
 // do not identify express
 app.disable('x-powered-by');
 
+app.set('view engine', 'ejs');
+app.set('views', cfg.dir.views);
+
 // HTTP compression
 app.use( compression() );
 
@@ -34,11 +38,19 @@ app.use((req, res, next) => {
 
 // home page route
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.render('message', { title: 'Hello World!' });
+});
+
+app.get('/hello/', (req, res) => {
+    res.render('message', { title: 'Hello again!' });
 });
 
 // serve static assets
 app.use(express.static( cfg.dir.static ));
+
+app.use((req, res) => {
+    res.status(404).render('message', { title: 'Not found' });
+});
 
 // start server
 app.listen(cfg.port, () => {
